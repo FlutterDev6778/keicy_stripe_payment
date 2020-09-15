@@ -14,7 +14,7 @@ class KeicyStripePayment {
   String publicKey;
 
   static final KeicyStripePayment _instance = KeicyStripePayment();
-  KeicyStripePayment get instance => _instance;
+  static KeicyStripePayment get instance => _instance;
 
   init({
     @required String publicKey,
