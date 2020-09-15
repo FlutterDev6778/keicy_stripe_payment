@@ -7,13 +7,13 @@ import 'package:http/http.dart' as http;
 import 'package:stripe_payment/stripe_payment.dart';
 
 class KeicyStripePayment {
-  static String apiBase = 'https://api.stripe.com/v1';
+  static final String apiBase = 'https://api.stripe.com/v1';
   String paymentApiUrl;
   Map<String, String> headers;
   String secretKey;
   String publicKey;
 
-  KeicyStripePayment _instance = KeicyStripePayment();
+  static final KeicyStripePayment _instance = KeicyStripePayment();
   KeicyStripePayment get instance => _instance;
 
   init({
