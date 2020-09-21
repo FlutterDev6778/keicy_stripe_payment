@@ -8,36 +8,41 @@ import 'package:stripe_payment/stripe_payment.dart';
 
 class KeicyStripePayment {
   static final String apiBase = 'https://api.stripe.com/v1';
-  String paymentApiUrl;
-  Map<String, String> headers;
-  String secretKey;
-  String publicKey;
+  static String paymentApiUrl;
+  static Map<String, String> headers;
+  static String secretKey;
+  static String publicKey;
 
-  static final KeicyStripePayment _instance = KeicyStripePayment();
-  static KeicyStripePayment get instance => _instance;
+  // static final KeicyStripePayment _instance = KeicyStripePayment();
+  // static KeicyStripePayment get instance => _instance;
 
-  init({
+  static init({
     @required String publicKey,
     @required String secretKey,
     String merchantId = "Test",
-    String androidPayMode = "Test", // production
+    String androidPayMode = "test", // production
   }) {
-    this.secretKey = secretKey;
-    this.publicKey = publicKey;
-    this.paymentApiUrl = '${KeicyStripePayment.apiBase}/payment_intents';
+    secretKey = secretKey;
+    publicKey = publicKey;
+    paymentApiUrl = '${KeicyStripePayment.apiBase}/payment_intents';
     headers = {
       'Authorization': 'Bearer $secretKey',
       'Content-Type': 'application/x-www-form-urlencoded',
     };
 
     StripePayment.setOptions(
-      StripeOptions(publishableKey: this.publicKey, merchantId: merchantId, androidPayMode: androidPayMode),
+      StripeOptions(publishableKey: publicKey, merchantId: merchantId, androidPayMode: androidPayMode),
     );
   }
 
-  Future<Map<String, dynamic>> getPaymentMethodFromExistingCard(CreditCard card) async {
+  static Future<Map<String, dynamic>> getPaymentMethodFromExistingCard({
+    CreditCard card,
+    BillingAddress billingAddress,
+    Map<String, String> metadata,
+  }) async {
     try {
-      var paymentMethod = await StripePayment.createPaymentMethod(PaymentMethodRequest(card: card));
+      var paymentMethod =
+          await StripePayment.createPaymentMethod(PaymentMethodRequest(card: card, billingAddress: billingAddress, metadata: metadata));
       return {
         "success": true,
         "message": "Create PaymentMethod Success",
@@ -59,7 +64,7 @@ class KeicyStripePayment {
     }
   }
 
-  Future<Map<String, dynamic>> getPaymentMethodFromNewCard() async {
+  static Future<Map<String, dynamic>> getPaymentMethodFromNewCard() async {
     try {
       var paymentMethod = await StripePayment.paymentRequestWithCardForm(CardFormPaymentRequest());
       return {
@@ -83,7 +88,7 @@ class KeicyStripePayment {
     }
   }
 
-  Future<Map<String, dynamic>> createPaymentIntent({
+  static Future<Map<String, dynamic>> createPaymentIntent({
     @required String amount,
     String currency = 'usd',
     String paymentMethodTypes = 'card',
@@ -116,7 +121,7 @@ class KeicyStripePayment {
     }
   }
 
-  Future<Map<String, dynamic>> payViaPaymentMethod({
+  static Future<Map<String, dynamic>> payViaPaymentMethod({
     @required Map<String, dynamic> jsonData,
     @required String amount,
     @required String currency,
