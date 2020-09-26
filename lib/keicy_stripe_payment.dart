@@ -110,8 +110,8 @@ class KeicyStripePayment {
       } else {
         return {
           "success": false,
-          "message": result["reasonPhrase"],
-          "code": result["statusCode"],
+          "message": result["error"]["message"],
+          "code": result["error"]["code"],
         };
       }
     } on PlatformException catch (err) {
