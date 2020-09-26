@@ -46,7 +46,7 @@ class KeicyStripePayment {
       return {
         "success": true,
         "message": "Create PaymentMethod Success",
-        "data": paymentMethod.toJson(),
+        "data": paymentMethod,
       };
     } on PlatformException catch (err) {
       print('getPaymentMethodFromExistingCard: ${err.toString()}');
@@ -70,7 +70,7 @@ class KeicyStripePayment {
       return {
         "success": true,
         "message": "Create PaymentMethod Success",
-        "data": paymentMethod.toJson(),
+        "data": paymentMethod,
       };
     } on PlatformException catch (err) {
       return {
@@ -131,16 +131,17 @@ class KeicyStripePayment {
       return paymentIntent;
     } else {
       try {
-        var response = await StripePayment.confirmPaymentIntent(
+        PaymentIntentResult paymentIntentResult = await StripePayment.confirmPaymentIntent(
           PaymentIntent(
             clientSecret: paymentIntent['data']['client_secret'],
             paymentMethodId: paymentMethod.id,
           ),
         );
-        if (response.status == 'succeeded') {
+        if (paymentIntentResult.status == 'succeeded') {
           return {
             "success": true,
             "message": 'Transaction successful',
+            "paymentIntentResult": paymentIntentResult,
           };
         } else {
           return {
