@@ -100,11 +100,20 @@ class KeicyStripePayment {
         'payment_method_types[]': paymentMethodTypes,
       };
       var response = await http.post(paymentApiUrl, body: body, headers: headers);
-      return {
-        "success": true,
-        "message": "Create Payment Intent Success",
-        'data': jsonDecode(response.body),
-      };
+      var result = jsonDecode(response.body);
+      if (result["statusCode"] == 200) {
+        return {
+          "success": true,
+          "message": "Create Payment Intent Success",
+          'data': result,
+        };
+      } else {
+        return {
+          "success": false,
+          "message": result["reasonPhrase"],
+          "code": result["statusCode"],
+        };
+      }
     } on PlatformException catch (err) {
       return {
         "success": false,
