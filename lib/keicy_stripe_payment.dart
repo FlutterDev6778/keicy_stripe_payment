@@ -150,7 +150,7 @@ class KeicyStripePayment {
           return {
             "success": true,
             "message": 'Transaction successful',
-            "paymentIntentResult": paymentIntentResult,
+            "paymentIntentResult": paymentIntentResult.toJson(),
             "paymentIntent": paymentIntent['data'],
           };
         } else {
