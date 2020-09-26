@@ -122,12 +122,10 @@ class KeicyStripePayment {
   }
 
   static Future<Map<String, dynamic>> payViaPaymentMethod({
-    @required Map<String, dynamic> jsonData,
+    @required PaymentMethod paymentMethod,
     @required String amount,
     @required String currency,
   }) async {
-    PaymentMethod paymentMethod = PaymentMethod.fromJson(jsonData);
-
     var paymentIntent = await createPaymentIntent(amount: amount);
     if (!paymentIntent["success"]) {
       return paymentIntent;
