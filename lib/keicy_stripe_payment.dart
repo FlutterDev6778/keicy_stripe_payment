@@ -101,7 +101,7 @@ class KeicyStripePayment {
       };
       var response = await http.post(paymentApiUrl, body: body, headers: headers);
       var result = jsonDecode(response.body);
-      if (result["statusCode"] == 200) {
+      if (result["id"] != null) {
         return {
           "success": true,
           "message": "Create Payment Intent Success",
@@ -151,6 +151,7 @@ class KeicyStripePayment {
             "success": true,
             "message": 'Transaction successful',
             "paymentIntentResult": paymentIntentResult,
+            "paymentIntent": paymentIntent['data'],
           };
         } else {
           return {
