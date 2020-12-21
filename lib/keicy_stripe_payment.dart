@@ -130,6 +130,48 @@ class KeicyStripePayment {
     }
   }
 
+  static Future<Map<String, dynamic>> refundPayment({
+    @required String amount,
+    @required String paymentIntent,
+  }) async {
+    try {
+      Map<String, dynamic> body = {
+        'amount': amount,
+        'paymentIntent': paymentIntent,
+      };
+      String refundPaymentUrl = KeicyStripePayment.apiBase + "/refunds";
+
+      var response = await http.post(refundPaymentUrl, body: body, headers: headers);
+      var result = jsonDecode(response.body);
+      if (result["id"] != null) {
+        return {
+          "success": true,
+          "message": "Refund Payment Intent Success",
+          'data': result,
+        };
+      } else {
+        return {
+          "success": false,
+          "message": result["error"]["message"],
+          "code": result["error"]["code"],
+        };
+      }
+    } on PlatformException catch (err) {
+      return {
+        "success": false,
+        "message": err.message,
+        "code": err.code,
+      };
+    } catch (err) {
+      print('createPaymentIntentViaCard: ${err.toString()}');
+      return {
+        "success": false,
+        "message": "Refund Payment Intent Failed",
+        "code": "404",
+      };
+    }
+  }
+
   static Future<Map<String, dynamic>> payViaPaymentMethod({
     @required PaymentMethod paymentMethod,
     @required String amount,
