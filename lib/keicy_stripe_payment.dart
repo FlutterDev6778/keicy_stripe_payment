@@ -10,8 +10,8 @@ class KeicyStripePayment {
   static final String apiBase = 'https://api.stripe.com/v1';
   static String paymentApiUrl;
   static Map<String, String> headers;
-  static String secretKey;
-  static String publicKey;
+  static String secretkey;
+  static String publickey;
 
   // static final KeicyStripePayment _instance = KeicyStripePayment();
   // static KeicyStripePayment get instance => _instance;
@@ -22,8 +22,8 @@ class KeicyStripePayment {
     String merchantId = "Test",
     String androidPayMode = "test", // production
   }) {
-    secretKey = secretKey;
-    publicKey = publicKey;
+    secretkey = secretKey;
+    publickey = publicKey;
     paymentApiUrl = '${KeicyStripePayment.apiBase}/payment_intents';
     headers = {
       'Authorization': 'Bearer $secretKey',
@@ -41,8 +41,7 @@ class KeicyStripePayment {
     Map<String, String> metadata,
   }) async {
     try {
-      var paymentMethod =
-          await StripePayment.createPaymentMethod(PaymentMethodRequest(card: card, billingAddress: billingAddress, metadata: metadata));
+      var paymentMethod = await StripePayment.createPaymentMethod(PaymentMethodRequest(card: card, billingAddress: billingAddress, metadata: metadata));
       return {
         "success": true,
         "message": "Create PaymentMethod Success",
@@ -142,6 +141,52 @@ class KeicyStripePayment {
       String refundPaymentUrl = KeicyStripePayment.apiBase + "/refunds";
 
       var response = await http.post(refundPaymentUrl, body: body, headers: headers);
+      var result = jsonDecode(response.body);
+      if (result["id"] != null) {
+        return {
+          "success": true,
+          "message": "Refund Payment Intent Success",
+          'data': result,
+        };
+      } else {
+        return {
+          "success": false,
+          "message": result["error"]["message"],
+          "code": result["error"]["code"],
+        };
+      }
+    } on PlatformException catch (err) {
+      return {
+        "success": false,
+        "message": err.message,
+        "code": err.code,
+      };
+    } catch (err) {
+      print('createPaymentIntentViaCard: ${err.toString()}');
+      return {
+        "success": false,
+        "message": "Refund Payment Intent Failed",
+        "code": "404",
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> createCharge({
+    @required String amount,
+    @required String currency,
+    @required String source,
+    @required String description,
+  }) async {
+    try {
+      Map<String, dynamic> body = {
+        'amount': amount,
+        'currency': currency,
+        'source': source,
+        'description': description,
+      };
+      String createChargeUrl = KeicyStripePayment.apiBase + "/charges";
+
+      var response = await http.post(createChargeUrl, body: body, headers: headers);
       var result = jsonDecode(response.body);
       if (result["id"] != null) {
         return {
